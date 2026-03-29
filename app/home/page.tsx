@@ -286,6 +286,42 @@ export default function Home() {
     setSessions(updatedSessions)
   }
 
+  const updateExerciseEffort = (exerciseId: string, effort: number) => {
+    const dateStr = format(selectedDate, 'yyyy-MM-dd')
+    const updatedSessions = sessions.map(session => {
+      if (session.date === dateStr) {
+        return {
+          ...session,
+          exercises: session.exercises.map(exercise => {
+            if (exercise.id === exerciseId) {
+              return {
+                ...exercise,
+                effort
+              }
+            }
+            return exercise
+          })
+        }
+      }
+      return session
+    })
+    setSessions(updatedSessions)
+  }
+
+  const updateSessionEffort = (effort: number) => {
+    const dateStr = format(selectedDate, 'yyyy-MM-dd')
+    const updatedSessions = sessions.map(session => {
+      if (session.date === dateStr) {
+        return {
+          ...session,
+          effort
+        }
+      }
+      return session
+    })
+    setSessions(updatedSessions)
+  }
+
   const calculateTotalWorkoutTime = (session: WorkoutSession) => {
     let totalMinutes = 0
     
@@ -448,12 +484,20 @@ export default function Home() {
                 <div className="bg-gradient-to-r from-orange-500/90 to-red-500/90 backdrop-blur-2xl rounded-2xl p-4 mb-6 text-white border border-white/30 shadow-2xl hover:shadow-3xl transition-all duration-300">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium tracking-tight">Today&apos;s Workout</span>
-                    {session.effort && (
-                      <div className="flex items-center gap-1">
-                        <Heart className="w-4 h-4" />
-                        <span className="font-bold">{session.effort}/10</span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-1">
+                      <Heart className="w-4 h-4" />
+                      <select
+                        value={session.effort || 7}
+                        onChange={(e) => updateSessionEffort(Number(e.target.value))}
+                        className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-2 py-1 text-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-white/50"
+                      >
+                        {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                          <option key={num} value={num} className="text-gray-900">
+                            {num}/10
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <div className="text-2xl font-bold mb-1">{session.exercises.length} Exercises</div>
                   <div className="flex items-center gap-1 text-white/90 text-sm">
@@ -490,12 +534,20 @@ export default function Home() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        {exercise.effort && (
-                          <div className="flex items-center gap-1">
-                            <Heart className="w-4 h-4 text-red-500" />
-                            <span className="text-gray-700 text-sm font-medium">{exercise.effort}</span>
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1">
+                          <Heart className="w-4 h-4 text-red-500" />
+                          <select
+                            value={exercise.effort || 7}
+                            onChange={(e) => updateExerciseEffort(exercise.id, Number(e.target.value))}
+                            className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-2 py-1 text-gray-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+                          >
+                            {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                              <option key={num} value={num} className="text-gray-900">
+                                {num}/10
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                         <button
                           onClick={() => removeExercise(exercise.id)}
                           className="p-1.5 bg-red-100/60 hover:bg-red-100/80 rounded-xl transition-all duration-300 hover:scale-110 backdrop-blur-xl"
