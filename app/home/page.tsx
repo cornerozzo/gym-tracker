@@ -554,36 +554,100 @@ export default function Home() {
       {/* Exercise Selection Modal */}
       {showExerciseModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xl flex items-end z-50">
-          <div className="bg-white/90 backdrop-blur-2xl w-full max-w-md mx-auto rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto border border-white/40 shadow-2xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900 tracking-tight">Select Exercise</h3>
-              <button
-                onClick={() => setShowExerciseModal(false)}
-                className="p-2.5 bg-white/60 backdrop-blur-xl rounded-xl border border-white/50 hover:bg-white/70 transition-all duration-300 hover:scale-110"
-              >
-                ×
-              </button>
+          <div className="bg-white/90 backdrop-blur-2xl w-full max-w-md mx-auto rounded-t-3xl p-6 max-h-[85vh] overflow-y-auto border border-white/40 shadow-2xl custom-scrollbar">
+            {/* Header */}
+            <div className="sticky top-0 bg-white/90 backdrop-blur-2xl -mx-6 px-6 pt-0 pb-4 border-b border-white/30 mb-6 z-10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 tracking-tight">Select Exercise</h3>
+                  <p className="text-sm text-gray-600 mt-1">Choose from {getBodyParts().length} categories</p>
+                </div>
+                <button
+                  onClick={() => setShowExerciseModal(false)}
+                  className="p-2.5 bg-white/60 backdrop-blur-xl rounded-xl border border-white/50 hover:bg-white/70 transition-all duration-300 hover:scale-110 hover:rotate-90"
+                >
+                  <X className="w-5 h-5 text-gray-700" />
+                </button>
+              </div>
             </div>
 
-            <div className="space-y-4">
-              {getBodyParts().map((part) => (
-                <div key={part.id}>
-                  <h4 className="text-gray-700 font-medium mb-2 flex items-center gap-2">
-                    <span>{part.icon}</span> {part.name}
-                  </h4>
-                  <div className="space-y-2">
-                    {EXERCISES_DATABASE[part.id as keyof typeof EXERCISES_DATABASE]?.map((exercise) => (
-                      <button
-                        key={exercise.name}
-                        onClick={() => addExercise(exercise.name, part.id, exercise.equipment, exercise.bodyPart)}
-                        className="w-full bg-white/50 hover:bg-white/70 rounded-xl p-3.5 text-left text-gray-900 transition-all duration-300 border border-white/40 backdrop-blur-xl hover:scale-[1.02] hover:shadow-lg"
-                      >
-                        {exercise.name}
-                      </button>
-                    ))}
+            {/* Categories Grid */}
+            <div className="space-y-6">
+              {getBodyParts().map((part, partIndex) => {
+                const exercises = EXERCISES_DATABASE[part.id as keyof typeof EXERCISES_DATABASE]
+                if (!exercises || exercises.length === 0) return null
+                
+                return (
+                  <div key={part.id} className="animate-fadeIn" style={{ animationDelay: `${partIndex * 50}ms` }}>
+                    {/* Category Header */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-orange-500/20 to-red-500/20 backdrop-blur-xl rounded-xl flex items-center justify-center border border-orange-200/50">
+                          <span className="text-lg">{part.icon}</span>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900 tracking-tight">{part.name}</h4>
+                          <p className="text-xs text-gray-500">{exercises.length} exercises</p>
+                        </div>
+                      </div>
+                      <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                    </div>
+
+                    {/* Exercises Grid */}
+                    <div className="grid gap-2">
+                      {exercises.map((exercise, exerciseIndex) => {
+                        const isTimeBased = ['cardio', 'benessere'].includes(part.id) || 
+                                           (part.id === 'addominali' && (exercise.equipment === 'corpo libero' || exercise.equipment === 'rotella' || exercise.equipment === 'sbarra'))
+                        
+                        return (
+                          <button
+                            key={exercise.name}
+                            onClick={() => addExercise(exercise.name, part.id, exercise.equipment, exercise.bodyPart)}
+                            className="group relative bg-white/50 hover:bg-white/70 rounded-xl p-4 text-left transition-all duration-300 border border-white/40 backdrop-blur-xl hover:scale-[1.02] hover:shadow-lg hover:border-orange-200/60"
+                            style={{ animationDelay: `${partIndex * 50 + exerciseIndex * 20}ms` }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <h5 className="font-medium text-gray-900 group-hover:text-orange-600 transition-colors mb-1">
+                                  {exercise.name}
+                                </h5>
+                                <div className="flex items-center gap-3 text-xs">
+                                  <span className="text-gray-500 bg-white/60 px-2 py-1 rounded-lg">
+                                    {exercise.equipment}
+                                  </span>
+                                  {isTimeBased && (
+                                    <span className="text-orange-600 bg-orange-100/60 px-2 py-1 rounded-lg flex items-center gap-1">
+                                      <Timer className="w-3 h-3" />
+                                      Time-based
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                                  <Plus className="w-4 h-4 text-white" />
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Hover effect overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-red-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                          </button>
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
+            </div>
+
+            {/* Footer */}
+            <div className="sticky bottom-0 bg-white/90 backdrop-blur-2xl -mx-6 px-6 -mb-6 pt-4 pb-6 border-t border-white/30 mt-6">
+              <div className="text-center">
+                <p className="text-xs text-gray-500">
+                  Tap any exercise to add it to your workout
+                </p>
+              </div>
             </div>
           </div>
         </div>
