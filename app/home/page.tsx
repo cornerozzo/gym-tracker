@@ -610,10 +610,6 @@ export default function Home() {
             {/* Header */}
             <div className="sticky top-0 bg-white/90 backdrop-blur-2xl -mx-6 px-6 pt-0 pb-4 border-b border-white/30 mb-6 z-10">
               <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 tracking-tight">Select Exercise</h3>
-                  <p className="text-sm text-gray-600 mt-1">Choose from {getBodyParts().length} categories</p>
-                </div>
                 <button
                   onClick={() => setShowExerciseModal(false)}
                   className="p-2.5 bg-white/60 backdrop-blur-xl rounded-xl border border-white/50 hover:bg-white/70 transition-all duration-300 hover:scale-110 hover:rotate-90"
